@@ -8,18 +8,16 @@ using System.Windows.Forms;
 
 namespace JR62THD_V2 {
     class Program {
-        const string pattern = @"[\w\d]+-([\w\d]{2})\s+(NRM|T(\d+))\s*(-?\d{1,2}.?\d*)\s*(-?\d{1,2}.?\d*)\s*(-?\d{1,2}.?\d*)\s*((-?\d+.?\d*)\s*)+";
+        const string pattern = @"[\w\d]+-([\w\d]{2})\s+(NRM|T(\d+))\s+(-?\d+.?\d*)\s+(-?\d+.?\d*)\s+(-?\d+.?\d*)\s+((-?\d+.?\d*)\s*)+";
         [STAThread]
         static void Main(string[] args) {
-            Console.BufferWidth = Console.WindowWidth = Console.LargestWindowWidth > 100 ? 100 : Console.LargestWindowWidth;
-            Console.BufferHeight = Console.WindowHeight = Console.LargestWindowHeight > 50 ? 50 : Console.LargestWindowHeight;
+            Console.BufferWidth = Console.WindowWidth = 100;
+            Console.BufferHeight = Console.WindowHeight = 50;
             ResetColor();
 #if DEBUG
 #else
-            if (Console.WindowWidth > 42 && Console.WindowHeight > 28) {
-                StartupLogoPlayer.play();
-                Thread.Sleep(500);
-            }
+            StartupLogoPlayer.play();
+            Thread.Sleep(500);
 #endif
             Console.BufferHeight = 1000;
             Console.Clear();

@@ -22,7 +22,6 @@ namespace JR62THD_V2 {
         private void InputDialog_Load(object sender, EventArgs e) {
             textBox1.Text = Value;
             checkBox1.Checked = ForAll;
-            this.Focus();
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e) {
