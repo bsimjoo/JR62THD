@@ -13,10 +13,6 @@ namespace JR62THD_V2 {
             const int AsciiMapWidth = 42;           // <-- ASCII Map lines count
             const int AsciiMapLinesOffset = 2;      // <-- each line ends with "\n\r" characters
 
-
-            Console.BufferWidth = Console.WindowWidth = 100;
-            Console.BufferHeight = Console.WindowHeight = 50;
-
             //Console.WriteLine("Press any key to continue");
             //Console.ReadKey(true);
             Console.Clear();
