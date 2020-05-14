@@ -29,9 +29,9 @@ namespace JR62THD_V2 {
             for (int seq = 0; seq<=3; seq++) {
                 //counting sequences of animation
                 //when all posible positions for cursor had been wrote a sequence compeleted
-                List<int[]> pos = new List<int[]> { new int[2] };
-                for (int t = 0; t <= Console.BufferHeight - 2; t++)
-                    for (int l = 0; l <= Console.BufferWidth - 1; l++)
+                List<int[]> pos = new List<int[]>();
+                for (int t = 2; t <= Console.BufferHeight - 3; t++)
+                    for (int l = 2; l <= Console.BufferWidth - 3; l++)
                         pos.Add(new int[] { l, t });
                 //a list of all posible cursor positions
                 //I used a list to make sure that each position will use just once and also know when this sequence will finish

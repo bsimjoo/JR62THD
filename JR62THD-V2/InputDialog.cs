@@ -28,5 +28,14 @@ namespace JR62THD_V2 {
         private void checkBox1_CheckedChanged(object sender, EventArgs e) {
             ForAll = checkBox1.Checked;
         }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e) {
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter) {
+                button1.PerformClick();
+            }
+        }
     }
 }

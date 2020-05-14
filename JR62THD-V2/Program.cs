@@ -8,15 +8,15 @@ using System.Windows.Forms;
 
 namespace JR62THD_V2 {
     class Program {
-        const string pattern = @"[\w\d]+-([\w\d]{2})\s+(NRM|T(\d+))\s*(-?\d{1,2}.?\d*)\s*(-?\d{1,2}.?\d*)\s*(-?\d{1,2}.?\d*)\s*((-?\d+.?\d*)\s*)+";
+        const string pattern = @"(\S+)\s+(NRM|T(\d+))\s*(-?\d{1,2}.?\d*)\s*(-?\d{1,2}.?\d*)\s*(-?\d{1,2}.?\d*)\s*((-?\d+.?\d*)\s*)+";
         [STAThread]
         static void Main(string[] args) {
-            Console.BufferWidth = Console.WindowWidth = Console.LargestWindowWidth > 100 ? 100 : Console.LargestWindowWidth;
+            Console.BufferWidth = Console.WindowWidth = Console.LargestWindowWidth > 80 ? 80 : Console.LargestWindowWidth;
             Console.BufferHeight = Console.WindowHeight = Console.LargestWindowHeight > 50 ? 50 : Console.LargestWindowHeight;
             ResetColor();
 #if DEBUG
 #else
-            if (Console.WindowWidth > 42 && Console.WindowHeight > 28) {
+            if (Console.WindowWidth > 45 && Console.WindowHeight > 32) {
                 StartupLogoPlayer.play();
                 Thread.Sleep(500);
             }
@@ -49,10 +49,10 @@ namespace JR62THD_V2 {
                 Console.SetCursorPosition(0, 7);
                 int count = 1;
                 foreach (string file in sourceFiles) {
-                    Console.WriteLine(string.Format("\r  [{0,3}] {1}", count, Path.GetFileName(file)).PadRight(99));
+                    Console.WriteLine(string.Format("\r  [{0,3}] {1}", count, Path.GetFileName(file)).PadRight(Console.WindowWidth-1));
                     count++;
                 }
-                AdvancedPrint("\r    Press [+], [Enter], [↑] or [↓]".PadRight(99), false, ForegroundColor: ConsoleColor.DarkGray);
+                AdvancedPrint("\r    Press [+], [Enter], [↑] or [↓]".PadRight(Console.WindowWidth - 1), false, ForegroundColor: ConsoleColor.DarkGray);
                 var key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter && sourceFiles.Count > 0) break;
                 else if (key.KeyChar == '=' || key.KeyChar == '+') continue;
@@ -62,8 +62,8 @@ namespace JR62THD_V2 {
                     foreach(var file in sourceFiles) {
                         ConsoleMenuItem item = new ConsoleMenuItem();
                         item.Text = string.Format("[{0,3}] {1}",index,Path.GetFileName(file));
-                        item.SelectedText= string.Format("[{0,3}] {1,-45} {2}", index, Path.GetFileName(file),"[Del] Remove | [Esc] Cancel");
-                        item.Length = 84;
+                        item.SelectedText= string.Format("[{0,3}] {1,-40} {2}", index, Path.GetFileName(file),"[Del] Remove | [Esc] Cancel");
+                        item.Length = 76;
                         item.Left = 2;
                         item.Top = 6 + index;
                         index++;
@@ -113,6 +113,7 @@ namespace JR62THD_V2 {
             Console.CursorVisible = false;
             List<string> incorrectFiles = new List<string>();
             string[] _sourceFiles = sourceFiles.ToArray();
+            
             foreach(string file in _sourceFiles) {
                 Console.Write($"\r Scanning file: {Path.GetFileName(file)}".PadRight(100));
                 using(StreamReader reader=new StreamReader(file)) {
@@ -133,17 +134,18 @@ namespace JR62THD_V2 {
                     }
                 }
             }
-            if (incorrectFiles.Count > 0) {
-                Console.WriteLine("\nBad files removed:");
-                Console.WriteLine(string.Join("\n", incorrectFiles));
-            }
             if (sourceFiles.Count == 0) {
                 MessageBox.Show("All source files weren't in correct format and now, there's not any file to convert.",
                     "Bad files",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 Environment.Exit(1);
+            }else if (incorrectFiles.Count > 0) {
+                Console.WriteLine("\nBad files removed:");
+                Console.WriteLine(string.Join("\n", incorrectFiles));
+                MessageBox.Show($"{incorrectFiles.Count} Bad files found and removed from source list", "Bad files found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+            
 
             Console.WriteLine();
             writeTitle("STEP3: Collecting more data and converting");
@@ -157,8 +159,9 @@ namespace JR62THD_V2 {
                 new string[] {"0.00", "0.00", "0.0", "0.0", "0.0", "0.00", "0.00", "0.00", "0.00", "0.00"},
                 new object[10]
             };
-            string[] formats = (string[])values[0];
+            string[] formats = (string[])values[0].Clone();
             values[1] = values[1].Select(x => (object)false).ToArray();
+            bool creatNewFile = true;
             foreach (string file in sourceFiles) {
                 //reading source file
                 Dictionary<string, List<string[]>> FileData = new Dictionary<string, List<string[]>>();
@@ -178,7 +181,7 @@ namespace JR62THD_V2 {
                 }
                 int filenum = 1;
                 foreach (var sample in FileData) {
-                    string Format = "KRIR1-"+sample.Key+"{0,10}{1,7}{2,8}{3,8}{4,8}{5,7}{6,7}{7,7}{8,7}\n";
+                    string Format = sample.Key+"{0,10}{1,7}{2,8}{3,8}{4,8}{5,7}{6,7}{7,7}{8,7}\n";
                     foreach(string[] data in sample.Value) {
                         Format += string.Format("{0,4}{1,15}{2,15}{3,15}", data) + "{9,7}\n";
                     }
@@ -246,9 +249,11 @@ namespace JR62THD_V2 {
                         outputFile = Path.GetFileNameWithoutExtension(output) + $" ({filenum})" + Path.GetExtension(output);
                         filenum++;
                     } else outputFile = output;
-                    using (StreamWriter writer = new StreamWriter(outputFile, singleOutput)) {
+                    using (StreamWriter writer = new StreamWriter(outputFile, singleOutput&&!creatNewFile)) {
+                        Format = Format.Replace("\n", "\r\n");
                         writer.Write(string.Format(Format, values[0]));
                     }
+                    creatNewFile = false;
                 }
             }
             Console.WriteLine("Done");
